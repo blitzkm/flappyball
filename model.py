@@ -79,9 +79,10 @@ class PipePairs:
 
 
 class Model:
-	def __init__(self, screen_width: int, screen_height: int) -> None:
+	def __init__(self, screen_width: int, screen_height: int, fps: int) -> None:
 		self._screen_width = screen_width
 		self._screen_height = screen_height
+		self._fps = fps
 		self._bird = Bird(screen_width//2, screen_height//2, 10, 0)
 		self._is_game_over = False
 		self._pipes: list[PipePairs] = []
@@ -91,10 +92,12 @@ class Model:
 
 	def update(self, was_spacebar_pressed: bool):
 
+		print(self._is_game_over)
+
 		if self.is_out_of_bounds(self._bird) == True:
 			self._is_game_over = True
 
-		if self._frame_count % (FPS * 2) == 0:
+		if self._frame_count % (self._fps * 2) == 0:
 			gap_start_y = random.randint(MIN_PIPE_HEIGHT, self._screen_height - MIN_PIPE_HEIGHT - GAP_HEIGHT) 
 			self._pipes.append(PipePairs(self._screen_width, GAP_HEIGHT, gap_start_y, self._screen_height))
 			print("2 second has passed")
@@ -154,4 +157,18 @@ class Model:
 
 	def is_out_of_bounds(self, bird: Bird) -> bool:
 		return bird.top <= 0 or bird.bottom >= self._screen_height 
+
+
+	@property
+	def screen_width(self):
+		return self._screen_width
+
+	@property
+	def screen_height(self):
+		return self._screen_height
+
+	@property
+	def fps(self):
+		return self._fps
+	
 

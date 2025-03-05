@@ -5,16 +5,19 @@ from project_types import UpdateHandler
 
 class View:
 
-	def __init__(self, update_handler: UpdateHandler) -> None:
+	def __init__(self) -> None:
+		self._update_handler = None
+		
+
+	def start(self, screen_width:int, screen_height:int, fps: int, update_handler: UpdateHandler):
 		self._update_handler = update_handler
-		pass
-	def start(self, screen_width:int, screen_height:int, fps: int):
+
 		pyxel.init(screen_width, screen_height, fps= fps) # you can add fps for third parameter
-		pyxel.run(self.update, self.draw) 
+		pyxel.run(update_handler.update, self.draw) 
 
+	# def update(self):
+	# 	self._update_handler.update()
 
-	def update(self):
-		self._update_handler.update()
 
 	def draw(self):
 		...

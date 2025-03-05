@@ -1,18 +1,19 @@
-import pyxel
+from model import Model
+from controller import Controller
+from view import View
 
-def draw():
-	pyxel.cls(0)
+def main():
+	screen_width = 200
+	screen_height = 200
+	fps = 30
 
-	for pipe_pair in pipes:
-		for pipe in [pipe_pair.top_pipe, pipe_pair.bottom_pipe]:
-			pyxel.rect(pipe.x, pipe.y, pipe.width, pipe.height, 5)
+	model = Model(screen_width, screen_height, fps)
+	view = View()
+	controller = Controller(model, view)
 
-	pyxel.circ(bird.x, bird.y, bird.radius, 7)
+	controller.start()
 
-	pyxel.text(SCREEN_WIDTH // 2 - 3, 15, str(score), 8)
 
-	if is_game_over:
-		pyxel.text(SCREEN_WIDTH // 2 - 15, SCREEN_HEIGHT // 2, "GAME OVER", 8)
+if __name__ == '__main__':
+	main()
 
-pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, fps= FPS) # you can add fps for third parameter
-pyxel.run(update, draw) 
