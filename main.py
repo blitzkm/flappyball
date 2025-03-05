@@ -8,7 +8,7 @@ def main():
 	fps = 30
 
 	model = Model(screen_width, screen_height, fps)
-	view = View()
+	view = View(model.screen_width, model.screen_height,)
 	controller = Controller(model, view)
 
 	controller.start()

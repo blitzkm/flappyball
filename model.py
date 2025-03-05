@@ -1,5 +1,8 @@
 from dataclasses import dataclass
+from project_types import Pipe, PipePairInfo, BallInfo
+from collections.abc import Sequence
 import random
+
 
 SCREEN_WIDTH = 200
 SCREEN_HEIGHT = 200
@@ -11,7 +14,7 @@ PIPE_VX = 2
 MIN_PIPE_HEIGHT = 10
 
 @dataclass
-class Bird:
+class Ball:
 	x: float
 	y: float
 	radius: float
@@ -34,28 +37,6 @@ class Bird:
 	def right(self):
 		return self.x + self.radius
 
-@dataclass
-class Pipe:
-	x: float
-	y: float
-	width: float
-	height: float
-
-	@property
-	def top(self):
-		return self.y
-
-	@property
-	def bottom(self):
-		return self.y + self.height
-
-	@property
-	def left(self):
-		return self.x
-
-	@property
-	def right(self):
-		return self.x + self.width
 
 @dataclass(eq = False)
 class PipePairs:
@@ -83,7 +64,7 @@ class Model:
 		self._screen_width = screen_width
 		self._screen_height = screen_height
 		self._fps = fps
-		self._bird = Bird(screen_width//2, screen_height//2, 10, 0)
+		self._ball = Ball(screen_width//2, screen_height//2, 10, 0)
 		self._is_game_over = False
 		self._pipes: list[PipePairs] = []
 		self._done_pipes: set[PipePairs] = set()
@@ -94,7 +75,7 @@ class Model:
 
 		print(self._is_game_over)
 
-		if self.is_out_of_bounds(self._bird) == True:
+		if self.is_out_of_bounds(self._ball) == True:
 			self._is_game_over = True
 
 		if self._frame_count % (self._fps * 2) == 0:
@@ -106,20 +87,20 @@ class Model:
 			return
 
 		if was_spacebar_pressed:
-			self._bird.vy = BIRD_VY
+			self._ball.vy = BIRD_VY
 
-		self._bird.vy += 0.2
-		self._bird.y += self._bird.vy
+		self._ball.vy += 0.2
+		self._ball.y += self._ball.vy
 
 		for pipe_pair in self._pipes:
 			pipe_pair.x -= PIPE_VX
 
-			if pipe_pair not in self._done_pipes and self._bird.x > pipe_pair.x:
+			if pipe_pair not in self._done_pipes and self._ball.x > pipe_pair.x:
 				self._score += 10
 				self._done_pipes.add(pipe_pair)
 
 			for pipe in [pipe_pair.top_pipe, pipe_pair.bottom_pipe]:
-				if self.is_in_collision(self._bird, pipe):
+				if self.is_in_collision(self._ball, pipe):
 					self._is_game_over = True
 					break
 
@@ -131,32 +112,32 @@ class Model:
 
 		self._frame_count += 1
 
-	def is_in_collision(self, bird: Bird, pipe: Pipe) -> bool:
+	def is_in_collision(self, ball: Ball, pipe: Pipe) -> bool:
 
-		if bird.right < pipe.left:
+		if ball.right < pipe.left:
 			test_x = pipe.left
 
-		elif bird.left > pipe.right:
+		elif ball.left > pipe.right:
 			test_x = pipe.right
 
 		else:
-			test_x = bird.x
+			test_x = ball.x
 
-		if bird.bottom < pipe.top:
+		if ball.bottom < pipe.top:
 			test_y = pipe.top
 
-		elif bird.top > pipe.bottom:
+		elif ball.top > pipe.bottom:
 			test_y = pipe.bottom
 
 		else:
-			test_y = bird.y
+			test_y = ball.y
 
-		dist = ((test_x - bird.x)**2 + (test_y - bird.y)**2)**0.5
+		dist = ((test_x - ball.x)**2 + (test_y - ball.y)**2)**0.5
 
-		return dist < bird.radius
+		return dist < ball.radius
 
-	def is_out_of_bounds(self, bird: Bird) -> bool:
-		return bird.top <= 0 or bird.bottom >= self._screen_height 
+	def is_out_of_bounds(self, ball: Ball) -> bool:
+		return ball.top <= 0 or ball.bottom >= self._screen_height 
 
 
 	@property
@@ -170,5 +151,21 @@ class Model:
 	@property
 	def fps(self):
 		return self._fps
+
+	@property
+	def pipes(self) -> Sequence[PipePairInfo]:
+		return self._pipes
+
+	@property
+	def ball(self) -> BallInfo:
+		return self._ball
+
+	@property
+	def score(self) -> int:
+		return self._score
+
+	@property
+	def is_game_over(self) -> bool:
+		return self._is_game_over
 	
 
